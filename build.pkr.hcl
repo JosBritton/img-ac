@@ -38,4 +38,9 @@ build {
         use_proxy = false
         galaxy_force_install = true # https://github.com/ansible/proposals/issues/181
     }
+
+    provisioner "shell" {
+        # reclaim space for thin-provisioned images
+        inline = ["dd if=/dev/zero of=/EMPTY bs=1M || true", "rm -f /EMPTY", "sync"]
+    }
 }

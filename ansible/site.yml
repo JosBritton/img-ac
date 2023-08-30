@@ -33,4 +33,3 @@
   become: true
   roles:
     - role: template-prep
-      zero_disk: true
