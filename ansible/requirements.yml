@@ -1,0 +1,7 @@
+roles:
+  - src: git+https://github.com/JoeeBritton/envoylb-tcp.git
+    version: "c45493d83fde338e7f4875e2711ace57bb150875"
+  - src: git+https://github.com/JoeeBritton/template-prep.git
+    version: "743ae038194d5fbdc0d3900976678eed294cf6b6"
+  - src: git+https://github.com/JoeeBritton/keepalived.git
+    version: "a73191c2e49cc7ce1c4a17fd90ef460c76439e94"

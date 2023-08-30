@@ -1,0 +1,36 @@
+---
+- name: Prepare envoy load balancer image
+  hosts: envoy-lb
+  become: true
+  roles:
+    - role: envoylb-tcp
+      envoy_cluster_hosts:
+        - "k8s-control-1.local"
+        - "k8s-control-2.local"
+        - "k8s-control-3.local"
+      health_check_interval: 2s
+      health_check_timeout: 1s
+      health_check_unhealthy_threshold: 1
+      health_check_healthy_threshold: 1
+      envoy_dns_type: strict_dns
+      envoy_lb_policy: round_robin
+      envoy_socket_address: "0.0.0.0"
+      envoy_cluster_health_check_http_path: "/healthz"
+      envoy_listener_port: 6443
+
+    - role: keepalived
+      keepalived_instances:
+        internal:
+          interface: "{{ ansible_default_ipv4.interface }}"
+          state: "MASTER"
+          virtual_router_id: 42
+          priority: "100"
+          vips:
+            - "127.0.0.100/24 dev {{ ansible_default_ipv4.interface }}"
+
+- name: Prepare image for VM template (run this last!)
+  hosts: all
+  become: true
+  roles:
+    - role: template-prep
+      zero_disk: true

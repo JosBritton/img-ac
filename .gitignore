@@ -1,0 +1,4 @@
+pvecreds.pkrvars.hcl
+**/out/*
+.ssh
+.venv
