@@ -41,6 +41,11 @@ build {
 
     provisioner "shell" {
         # reclaim space for thin-provisioned images
-        inline = ["dd if=/dev/zero of=/EMPTY bs=1M || true", "rm -f /EMPTY", "sync"]
+        inline = [
+            "dd if=/dev/zero of=/EMPTY bs=1M 2>&1 || true",
+            "rm -f /EMPTY",
+            "sync",
+            "echo Done."
+        ]
     }
 }
