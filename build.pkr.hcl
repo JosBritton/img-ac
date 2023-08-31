@@ -29,7 +29,7 @@ build {
 
     # playbook targets host with associated group name
     provisioner "ansible" {
-        command = "ansible/playbook.sh"
+        command = "scripts/playbook.sh"
         host_alias = "default"
         groups = ["${var.dir}"]
         playbook_file = "ansible/site.yml"
