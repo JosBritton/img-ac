@@ -5,12 +5,13 @@ locals {
 }
 
 source "qemu" "base" {
-    disk_size = var.local_vm_settings.virtual_disk_size
-    headless = true
-    disk_cache = var.local_vm_settings.cache
-    disk_image = true
-    format = var.local_vm_settings.output_format
     use_backing_file = false
+    headless = true
+    disk_image = true
+
+    disk_size = var.local_vm_settings.virtual_disk_size
+    disk_cache = var.local_vm_settings.cache
+    format = var.local_vm_settings.output_format
     memory = var.local_vm_settings.memory
     net_device = var.local_vm_settings.net_device
     disk_interface = var.local_vm_settings.disk_interface
