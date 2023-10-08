@@ -2,7 +2,8 @@ SHELL := /usr/bin/env sh
 
 -include config/config.mak
 
-build_only      ?= 0
+build_only=
+
 platform_ve     ?= proxmox
 parallel_builds ?= $(shell nproc || sysctl -n hw.ncpu || echo 1)
 
@@ -11,14 +12,6 @@ MAKEFLAGS += --jobs=$(parallel_builds)
 ifeq ($(ansible_groups),)
 $(error ansible_groups is not defined)
 endif
-
-define assert_boolean
-$(if $(filter 1 0,$(value $(1))),,\
-	$(error $(1) is not a boolean value (1 or 0))\
-)
-endef
-
-$(call assert_boolean,build_only)
 
 post_build_targets = $(foreach group,$(sort $(ansible_groups)),phony/$(group)/post_build)
 
@@ -31,7 +24,7 @@ sources = main.pkr.hcl sources.pkr.hcl variables.pkr.hcl \
 
 # allow build aliases for ansible groups and optionally skipping post-build tasks
 $(ansible_groups): %: output/%/packer-kvm.img \
-$(if $(filter 0,$(build_only)),phony/%/post_build)
+$(if $(build_only),,phony/%/post_build)
 
 .SECONDARY: output/%/packer-kvm.img
 output/%/packer-kvm.img: $(sources) config/ansible/%.yaml \
