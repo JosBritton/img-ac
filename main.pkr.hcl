@@ -8,12 +8,15 @@ build {
   }
 
   provisioner "ansible" {
-    command       = "scripts/playbook.sh"
     playbook_file = "config/ansible/${var.target}.yaml"
     galaxy_file   = "config/ansible/requirements.yaml"
-    extra_arguments = [
-      "--scp-extra-args", "'-O'" # https://github.com/hashicorp/packer/issues/11783
+    ansible_env_vars = [
+      "ANSIBLE_FORCE_COLOR=1",
+      "PYTHONUNBUFFERED=1",
+      "ANSIBLE_HOST_KEY_CHECKING=False"
     ]
+    # https://github.com/hashicorp/packer/issues/11783
+    extra_arguments = ["--scp-extra-args", "'-O'"]
     galaxy_force_install = true
   }
 
