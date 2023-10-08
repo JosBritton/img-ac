@@ -6,3 +6,4 @@ config/*
 vehost.pkr.hcl
 *.pkrvars.hcl
 !example.pkrvars.hcl
+plugin.pkr.hcl.lock
