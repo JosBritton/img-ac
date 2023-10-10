@@ -2,6 +2,7 @@ SHELL := /usr/bin/env sh
 
 -include config/config.mak
 
+build_only      ?=
 platform_ve     ?= proxmox
 parallel_builds ?= $(shell nproc || sysctl -n hw.ncpu || echo 1)
 
