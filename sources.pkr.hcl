@@ -20,6 +20,8 @@ source "qemu" "kvm" {
   ssh_username = var.image.user
   ssh_password = null
 
+  shutdown_command = var.image.shutdown_command
+
   disk_size      = var.local_vm_settings.virtual_disk_size
   disk_cache     = var.local_vm_settings.cache
   format         = var.local_vm_settings.output_format
