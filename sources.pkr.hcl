@@ -22,6 +22,7 @@ source "qemu" "kvm" {
 
   shutdown_command = var.image.shutdown_command
 
+  # local VM resources
   disk_size      = var.local_vm_settings.virtual_disk_size
   disk_cache     = var.local_vm_settings.cache
   format         = var.local_vm_settings.output_format
