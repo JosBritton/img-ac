@@ -1,5 +1,3 @@
-SHELL := /usr/bin/env sh
-
 -include config/config.mak
 
 build_only      ?=
