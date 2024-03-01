@@ -1,6 +1,5 @@
 output/*
 config/*
-!config/example
 .ssh
 .venv
 vehost.pkr.hcl
