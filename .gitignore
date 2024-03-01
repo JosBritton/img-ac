@@ -1,8 +1,8 @@
 output/*
 config/*
-!config/example
 .ssh
 .venv
 vehost.pkr.hcl
 *.pkrvars.hcl
 !example.pkrvars.hcl
+plugin.pkr.hcl.lock

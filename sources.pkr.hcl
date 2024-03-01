@@ -1,40 +1,52 @@
-locals {
-    iso_checksum = "sha512:42f3565ef632bea438b55acffb24a87400c4e285c50a5b79083da1c2ba6eb02e381adb3b45fec387f2852b64170a451be46bcc3b50c0d79a229daaf641b96453"
-    iso_url = "https://cloud.debian.org/images/cloud/bookworm/20230910-1499/debian-12-genericcloud-amd64-20230910-1499.qcow2"
-    instance-id = uuidv5("url", "${local.iso_url}")
+source "null" "post" {
+  communicator = "none"
 }
 
-source "qemu" "base" {
-    disk_size = var.local_vm_settings.virtual_disk_size
-    headless = true
-    disk_cache = var.local_vm_settings.cache
-    disk_image = true
-    format = var.local_vm_settings.output_format
-    use_backing_file = false
-    memory = var.local_vm_settings.memory
-    net_device = var.local_vm_settings.net_device
-    disk_interface = var.local_vm_settings.disk_interface
-    http_content = {
-        "/user-data" = join("\n", ["#cloud-config", yamlencode({
-            "users" = [
-                {
-                    "name": "root"
-                    "ssh_authorized_keys": [
-                        var.ssh_public_key
-                    ]
-                }
-            ]
-        })])
-        "/meta-data" = yamlencode({
-            instance-id = local.instance-id
-        })
-    }
-    qemuargs = [
-        ["-smbios", "type=1,serial=ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/"]
-    ]
-    ssh_private_key_file = var.ssh_private_key_file_path
-    ssh_username = "root"
+source "qemu" "kvm" {
+  use_backing_file = false
+  headless         = true
+  disk_image       = true
+  ssh_timeout      = "120s"
+  disk_compression = true
 
-    iso_url = var.image_url
-    iso_checksum = var.image_checksum
+  output_directory     = "output/${var.target}"
+  ssh_private_key_file = "/tmp/packer/id_${var.target}"
+  vm_name              = "packer-kvm.img"
+
+  # when building in parallel, a global lock is used to prevent race conditions when downloading
+  iso_url      = var.image.url
+  iso_checksum = var.image.checksum
+
+  ssh_username = var.image.user
+  ssh_password = null
+
+  shutdown_command = var.image.shutdown_command
+
+  # local VM resources
+  disk_size      = var.local_vm_settings.virtual_disk_size
+  disk_cache     = var.local_vm_settings.cache
+  format         = var.local_vm_settings.output_format
+  memory         = var.local_vm_settings.memory
+  net_device     = var.local_vm_settings.net_device
+  disk_interface = var.local_vm_settings.disk_interface
+
+  # to my knowledge, this cloud-init config is distro agnostic
+  http_content = {
+    "/user-data" = join("\n", ["#cloud-config", yamlencode({
+      "users" = [
+        {
+          "name" : var.image.user
+          "ssh_authorized_keys" : [
+            file("/tmp/packer/id_${var.target}.pub")
+          ]
+        }
+      ]
+    })])
+    "/meta-data" = yamlencode({
+      instance-id = uuidv5("url", var.image.url)
+    })
+  }
+  qemuargs = [
+    ["-smbios", "type=1,serial=ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/"]
+  ]
 }
