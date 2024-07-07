@@ -52,9 +52,18 @@ variable "local_vm_settings" {
   }
 }
 
+variable "vehost_sources" {
+  type = list(object({
+    name                 = string
+    ssh_host             = string
+    ssh_username         = string
+    ssh_private_key_file = string
+  }))
+  default = null
+}
+
 variable "proxmox_settings" {
-  description = "Settings for the Proxmox VM."
-  type = object({
+  type = map(object({
     memory       = string
     cpu          = string
     net          = string
@@ -66,18 +75,7 @@ variable "proxmox_settings" {
     cache        = string
     discard      = string
     diskformat   = string
-  })
-  default = {
-    memory       = "2048"
-    cpu          = "1"
-    net          = "virtio,bridge=vmbr0"
-    scsihw       = "virtio-scsi-single"
-    imagestorage = "local-lvm"
-    ostype       = "l26"
-    balloon      = "0"
-    qemuagent    = "enabled=1,fstrim_cloned_disks=1"
-    cache        = "none"
-    discard      = "on"
-    diskformat   = "raw"
-  }
+    vmid         = string
+  }))
+  default = null
 }

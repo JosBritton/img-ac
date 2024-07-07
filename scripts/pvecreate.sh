@@ -30,11 +30,11 @@ _vmid_max_int=999999999
 _vmid_min_int=100
 readonly _vmid_min_int _vmid_max_int
 
-_vmid=$(/usr/bin/env pvesh get /cluster/nextid)
-readonly _vmid
-if [ -z "${_vmid:+1}" ] || \
-    [ "$_vmid" -lt $_vmid_min_int ] || [ "$_vmid" -gt $_vmid_max_int ]; then
-    err Could not get next VM ID.
+[ -z "${VMID:+1}" ] && VMID=$(/usr/bin/env pvesh get /cluster/nextid)
+
+if [ -z "${VMID:+1}" ] || \
+    [ "$VMID" -lt $_vmid_min_int ] || [ "$VMID" -gt $_vmid_max_int ]; then
+    err "Could not get next VM ID."
 fi
 
 _defint=$(/usr/bin/env ip route \
@@ -42,7 +42,7 @@ _defint=$(/usr/bin/env ip route \
     | sed 's/.* dev \([^ ]\+\)/\1/')
 readonly _defint
 if [ -z "${_defint:+1}" ] || [ ! -e "/sys/class/net/$_defint" ]; then
-    err Could not get default interface.
+    err "Could not get default interface."
 fi
 
 assert_has_value "$VMNAME" "VMNAME"
@@ -61,7 +61,7 @@ assert_has_value "$VMDISCARD" "VMDISCARD"
 
 assert_is_file "$VMIMGPATH" "VMIMGPATH"
 
-qm create "$_vmid" \
+qm create "$VMID" \
     --name "$VMNAME" \
     --memory "$VMMEM" \
     --core "$VMCORES" \

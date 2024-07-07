@@ -1,8 +1,19 @@
+source "null" "ssh" {}
+
 # common upload builder for all virtual environments
 build {
   name = "veupload"
 
-  sources = ["source.null.vehost"]
+  dynamic "source" {
+    labels = ["null.ssh"]
+    for_each = var.vehost_sources
+    content {
+      name = source.value.name
+      ssh_host = source.value.ssh_host
+      ssh_username = source.value.ssh_username
+      ssh_private_key_file = source.value.ssh_private_key_file
+    }
+  }
 
   provisioner "file" {
     name        = "uploadimage"
@@ -14,25 +25,35 @@ build {
 build {
   name = "proxmox"
 
-  sources = ["source.null.vehost"]
+  dynamic "source" {
+    labels = ["null.ssh"]
+    for_each = var.vehost_sources
+    content {
+      name = source.value.name
+      ssh_host = source.value.ssh_host
+      ssh_username = source.value.ssh_username
+      ssh_private_key_file = source.value.ssh_private_key_file
+    }
+  }
 
   provisioner "shell" {
     name    = "createvm"
     scripts = ["./scripts/pvecreate.sh"]
     environment_vars = [
       "VMNAME=${lower(var.target)}",
-      "VMMEM=${var.proxmox_settings.memory}",
-      "VMCORES=${var.proxmox_settings.cpu}",
-      "VMNET=${var.proxmox_settings.net}",
-      "VMSCSIHW=${var.proxmox_settings.scsihw}",
-      "VMSTORE=${var.proxmox_settings.imagestorage}",
+      "VMID=${var.proxmox_settings[source.name].vmid}",
+      "VMMEM=${var.proxmox_settings[source.name].memory}",
+      "VMCORES=${var.proxmox_settings[source.name].cpu}",
+      "VMNET=${var.proxmox_settings[source.name].net}",
+      "VMSCSIHW=${var.proxmox_settings[source.name].scsihw}",
+      "VMSTORE=${var.proxmox_settings[source.name].imagestorage}",
       "VMIMGPATH=/tmp/packer-kvm.img",
-      "VMOSTYPE=${var.proxmox_settings.ostype}",
-      "VMBALLOON=${var.proxmox_settings.balloon}",
-      "VMQEMUAGENT=${var.proxmox_settings.qemuagent}",
-      "VMCACHE=${var.proxmox_settings.cache}",
-      "VMDISCARD=${var.proxmox_settings.discard}",
-      "VMDISKFORMAT=${var.proxmox_settings.diskformat}"
+      "VMOSTYPE=${var.proxmox_settings[source.name].ostype}",
+      "VMBALLOON=${var.proxmox_settings[source.name].balloon}",
+      "VMQEMUAGENT=${var.proxmox_settings[source.name].qemuagent}",
+      "VMCACHE=${var.proxmox_settings[source.name].cache}",
+      "VMDISCARD=${var.proxmox_settings[source.name].discard}",
+      "VMDISKFORMAT=${var.proxmox_settings[source.name].diskformat}"
     ]
   }
 }

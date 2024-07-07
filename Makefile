@@ -76,10 +76,10 @@ vehost.pkr.hcl:
 # ambiguous state of vehost, so remote operations should always be out of date
 $(post_build_targets): phony/%/post_build: output/%/packer-kvm.img
 	. .venv/bin/activate && \
-	packer build --only "veupload.null.vehost" \
+	packer build --only "veupload.null.*" \
 		--var "target=$*" . && \
-	packer build --only "$(platform_ve).null.vehost" \
-		--var "target=$*" .
+	packer build --only "$(platform_ve).null.*" \
+		--var "target=$*" --parallel-builds=1 .
 
 .PHONY: clean
 clean: mostlyclean
