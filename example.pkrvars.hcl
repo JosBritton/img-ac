@@ -3,8 +3,8 @@
 
 image = {
   name             = "debian-12-amd64"
-  url              = "https://cloud.debian.org/images/cloud/bookworm/20240507-1740/debian-12-genericcloud-amd64-20240507-1740.qcow2"
-  checksum         = "sha512:e7efdc6e0ae643b05c6d53e10efbfd4454a769e13ddd69b5fabaa3e00c0ec431e6d6022530ecc922d944875409f4db66f69f1c134f64098959ab43de321d67c7"
+  url              = "https://cloud.debian.org/images/cloud/bookworm/20240717-1811/debian-12-genericcloud-amd64-20240717-1811.qcow2"
+  checksum         = "sha512:0f0075d53749dba4c9825e606899360626bb20ac6bab3dbdeff40041b051d203eb1a56e68d377c9fac0187faa0aea77fd543ef4a883fff2304eac252cce01b44"
   shutdown_command = "sudo shutdown now"
   user             = "packer"
 }
