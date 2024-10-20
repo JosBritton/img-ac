@@ -117,6 +117,32 @@
         {
             "matchManagers": ["github-actions"],
             "addLabels": ["renovate/github-action"]
+        },
+        {
+            "matchDatasources": ["custom.debian"],
+            "groupName": "debian",
+            "versioning": "regex:^(?<major>\\d{8})-(?<minor>\\d{4})$"
         }
-    ]
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": ["^example\\.pkrvars\\.hcl$"],
+            "datasourceTemplate": "custom.debian",
+            "depNameTemplate": "debian",
+            "matchStrings": [
+                "=\\s+\"https://cloud.debian.org/images/cloud/bookworm/(?<currentValue>.+)/",
+                "debian-12-genericcloud-amd64-(?<currentValue>.+).qcow2\"\\s*checksum\\s+=\\s+\"(?<currentDigest>sha512:[1-9a-z]{128})\""
+            ]
+        }
+    ],
+    "customDatasources": {
+        "debian": {
+            "defaultRegistryUrlTemplate": "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.json",
+            "format": "json",
+            "transformTemplates": [
+                "{\"releases\": [{\"version\": $$.(items[kind=\"Build\"].data.info.version),\"digest\": $$.(items[kind=\"Upload\"].metadata[labels.\"upload.cloud.debian.org/image-format\"=\"qcow2\"].annotations.\"cloud.debian.org/digest\"),\"sourceUrl\":$join([\"https://cloud.debian.org/images/cloud/\",items[kind=\"Build\"].data.info.release])}]}"
+            ]
+        }
+    }
 }
