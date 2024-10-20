@@ -104,6 +104,10 @@ install: $(GIT_DIR)/hooks/pre-commit
 lint:
 	packer fmt --recursive --check --diff --write=false .
 
+.PHONY: validate
+validate: plugin.pkr.hcl.lock
+	packer validate --no-warn-undeclared-var --syntax-only .
+
 .PHONY: format
 format:
 	packer fmt --recursive --write=true .

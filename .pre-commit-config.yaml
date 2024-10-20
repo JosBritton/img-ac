@@ -4,6 +4,6 @@ repos:
     - id: pre-commit
       name: lint
       language: system
-      entry: make lint
+      entry: make lint validate
       verbose: true
       stages: [ pre-commit ]
