@@ -2,9 +2,16 @@
 
 build_only      ?=
 platform_ve     ?= proxmox
-parallel_builds ?= $(shell nproc || sysctl -n hw.ncpu || echo 1)
 
-MAKEFLAGS += --jobs=$(parallel_builds)
+ifeq ($(filter --jobs,$(MAKEFLAGS)),)
+ifeq ($(filter -J,$(MAKEFLAGS)),)
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+MAKEFLAGS += --jobs=$(shell nproc || sysctl -n hw.ncpu || echo 1)
+endif
+endif
+endif
+
+GIT_DIR := $(shell git rev-parse --git-dir)
 
 ifeq ($(ansible_groups),)
 $(error ansible_groups is not defined)
