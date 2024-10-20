@@ -16,7 +16,7 @@ build {
       "ANSIBLE_HOST_KEY_CHECKING=False"
     ]
     # https://github.com/hashicorp/packer/issues/11783
-    extra_arguments = ["--scp-extra-args", "'-O'"]
+    extra_arguments      = ["--scp-extra-args", "'-O'"]
     galaxy_force_install = true
   }
 

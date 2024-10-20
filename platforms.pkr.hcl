@@ -5,12 +5,12 @@ build {
   name = "veupload"
 
   dynamic "source" {
-    labels = ["null.ssh"]
+    labels   = ["null.ssh"]
     for_each = var.vehost_sources
     content {
-      name = source.value.name
-      ssh_host = source.value.ssh_host
-      ssh_username = source.value.ssh_username
+      name                 = source.value.name
+      ssh_host             = source.value.ssh_host
+      ssh_username         = source.value.ssh_username
       ssh_private_key_file = source.value.ssh_private_key_file
     }
   }
@@ -26,12 +26,12 @@ build {
   name = "proxmox"
 
   dynamic "source" {
-    labels = ["null.ssh"]
+    labels   = ["null.ssh"]
     for_each = var.vehost_sources
     content {
-      name = source.value.name
-      ssh_host = source.value.ssh_host
-      ssh_username = source.value.ssh_username
+      name                 = source.value.name
+      ssh_host             = source.value.ssh_host
+      ssh_username         = source.value.ssh_username
       ssh_private_key_file = source.value.ssh_private_key_file
     }
   }
