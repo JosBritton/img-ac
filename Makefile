@@ -94,4 +94,21 @@ $(post_build_targets): phony/%/post_build: output/%/packer-kvm.img
 .PHONY: clean
 clean: | /tmp/packer/
 	find /tmp/packer/ output/ -mindepth 1 -delete
+	(. .venv/bin/activate && pre-commit uninstall) || true
 	rm -rf .venv/
+
+.PHONY: install
+install: $(GIT_DIR)/hooks/pre-commit
+
+.PHONY: lint
+lint:
+	packer fmt --recursive --check --diff --write=false .
+
+.PHONY: format
+format:
+	packer fmt --recursive --write=true .
+
+$(GIT_DIR)/hooks/pre-commit: .pre-commit-config.yaml .venv/lock
+	. .venv/bin/activate && \
+	pre-commit install && \
+	touch $(GIT_DIR)/hooks/pre-commit

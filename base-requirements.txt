@@ -1,2 +1,2 @@
 ansible==8.3.0
-pip==23.2.1
+pre-commit==4.0.1

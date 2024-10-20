@@ -1,0 +1,9 @@
+repos:
+- repo: local
+  hooks:
+    - id: pre-commit
+      name: lint
+      language: system
+      entry: make lint
+      verbose: true
+      stages: [ pre-commit ]
