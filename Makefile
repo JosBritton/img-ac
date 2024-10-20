@@ -26,6 +26,9 @@ sources = main.pkr.hcl sources.pkr.hcl variables.pkr.hcl \
 $(ansible_groups): %: output/%/packer-kvm.img \
 $(if $(build_only),,phony/%/post_build)
 
+/tmp/packer/:
+	mkdir -p /tmp/packer/
+
 .SECONDARY: output/%/packer-kvm.img
 output/%/packer-kvm.img: $(sources) config/ansible/%.yaml \
 .venv/lock plugin.pkr.hcl.lock /tmp/packer/id_% /tmp/packer/id_%.pub | output/
@@ -39,8 +42,8 @@ output/%/packer-kvm.img: $(sources) config/ansible/%.yaml \
 	rm -f "/tmp/packer/id_$*" "/tmp/packer/id_$*.pub"
 
 .INTERMEDIATE: /tmp/packer/id_%.pub
-/tmp/packer/id_% /tmp/packer/id_%.pub:
-	mkdir -p -m 700 /tmp/packer/
+/tmp/packer/id_% /tmp/packer/id_%.pub: | /tmp/packer/
+	chmod -R 700 /tmp/packer/
 	echo y | ssh-keygen -q -N "" -C "" -f "$@" >/dev/null 2>&1
 
 .venv/lock: base-requirements.txt config/requirements.txt
@@ -82,6 +85,6 @@ $(post_build_targets): phony/%/post_build: output/%/packer-kvm.img
 		--var "target=$*" --parallel-builds=1 .
 
 .PHONY: clean
-clean:
+clean: | /tmp/packer/
 	find /tmp/packer/ output/ -mindepth 1 -delete
 	rm -rf .venv/
