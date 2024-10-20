@@ -82,9 +82,6 @@ $(post_build_targets): phony/%/post_build: output/%/packer-kvm.img
 		--var "target=$*" --parallel-builds=1 .
 
 .PHONY: clean
-clean: mostlyclean
-	rm -rf .venv/
-
-.PHONY: mostlyclean
-mostlyclean:
+clean:
 	find /tmp/packer/ output/ -mindepth 1 -delete
+	rm -rf .venv/
