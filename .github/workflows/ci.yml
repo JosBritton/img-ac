@@ -2,16 +2,30 @@ name: ci
 
 on:
   push:
-    branches: [ dev, main ]
   pull_request:
-    branches: [ dev, main ]
 
 jobs:
-  validate:
-    runs-on: ubuntu-22.04
+  packer:
+    runs-on: ubuntu-latest
+    name: Run Packer
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - name: Checkout
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
-      - uses: hashicorp/setup-packer@ae6b3ed3bec089bbfb576ab7d714df7cbc4b88a4
+      - name: Setup packer
+        uses: hashicorp/setup-packer@ae6b3ed3bec089bbfb576ab7d714df7cbc4b88a4
+        id: setup
         with:
           version: latest
+
+      - name: Run `packer init`
+        id: init
+        run: "packer init ."
+
+      - name: Run `packer fmt`
+        id: format
+        run: "packer fmt --recursive --check --diff --write=false ."
+
+      - name: Run `packer validate` (syntax)
+        id: validate
+        run: "packer validate --no-warn-undeclared-var --syntax-only ."
