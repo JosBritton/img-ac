@@ -10,7 +10,7 @@ jobs:
     name: Run Packer
     steps:
       - name: Checkout
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+        uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e
 
       - name: Setup packer
         uses: hashicorp/setup-packer@76e3039aa951aa4e6efe7e6ee06bc9ceb072142d
