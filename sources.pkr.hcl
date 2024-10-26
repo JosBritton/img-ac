@@ -14,8 +14,8 @@ source "qemu" "kvm" {
   vm_name              = "packer-kvm.img"
 
   # when building in parallel, a global lock is used to prevent race conditions when downloading
-  iso_url      = var.image.url
-  iso_checksum = var.image.checksum
+  iso_url      = var.image_repository[var.image.base].url
+  iso_checksum = var.image_repository[var.image.base].digest
 
   ssh_username = var.image.user
   ssh_password = null
@@ -43,7 +43,7 @@ source "qemu" "kvm" {
       ]
     })])
     "/meta-data" = yamlencode({
-      instance-id = uuidv5("url", var.image.url)
+      instance-id = uuidv5("url", var.image_repository[var.image.base].url)
     })
   }
   qemuargs = [

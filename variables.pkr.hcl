@@ -1,18 +1,24 @@
 variable "image" {
   type = object({
-    url              = string
-    checksum         = string
+    name             = string
+    base             = string
     shutdown_command = string
     user             = string
   })
   description = "The details of the base image to use for the VM."
   default = {
-    name             = "debian-12-amd64"
-    url              = "https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2"
-    checksum         = "sha512:6856277491c234fa1bc6f250cbd9f0d44f77524479536ecbc0ac536bc07e76322ebb4d42e09605056d6d3879c8eb87db40690a2b5dfe57cb19b0c673fc4c58ca"
-    shutdown_command = "sudo shutdown -P now"
+    name             = "packer-template"
+    base             = "debian-12-genericcloud-amd64"
+    shutdown_command = "sudo shutdown now"
     user             = "packer"
   }
+}
+
+variable "image_repository" {
+  type = map(object({
+    url    = string
+    digest = string
+  }))
 }
 
 variable "target" {
