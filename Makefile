@@ -53,11 +53,11 @@ output/%/packer-kvm.img: $(sources) config/ansible/%.yaml \
 	chmod -R 700 /tmp/packer/
 	echo y | ssh-keygen -q -N "" -C "" -f "$@" >/dev/null 2>&1
 
-.venv/lock: base-requirements.txt config/requirements.txt
+.venv/lock: requirements.txt config/requirements.txt
 	python3 -m venv .venv/
 
 	. .venv/bin/activate && \
-	python3 -m pip install -U -r base-requirements.txt -r config/requirements.txt
+	python3 -m pip install -U -r requirements.txt -r config/requirements.txt
 
 	touch .venv/lock
 
