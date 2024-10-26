@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yamllint disable rule:comments
+name: Check for image repository updates
+
+on: # yamllint disable-line rule:truthy
+  schedule:
+  - cron: 0 * * * *  # every hour
+  workflow_dispatch: {}
+
+jobs:
+  update-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install requirements
+        run: |
+          python3 -m pip install -U -r requirements.txt
+
+      - name: Get updates
+        id: update-file
+        run: |
+          python scripts/update_images.py
+
+      - name: Check if there are changes
+        id: check-changes
+        run: |
+          git diff --exit-code || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push changes
+        if: steps.check-changes.outputs.changed
+        run: |
+          git remote set-url origin $(git config remote.origin.url | sed "s/github.com/cloud-image-updater[bot]:${GITHUB_TOKEN}@github.com/g")
+          git config user.name "cloud-image-updater[bot]"
+          git config user.email "186404631+cloud-image-updater[bot]@users.noreply.github.com"
+          git add images.auto.pkrvars.hcl
+          git commit -m "Image repository updated"
+          git push origin --force HEAD:updateimages/image-repository-updated
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Create pull request
+        if: steps.check-changes.outputs.changed
+        run: |
+          curl -X POST "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/pulls" \
+          -H "Authorization: Bearer ${BEARER_TOKEN}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d '{
+            "title": "Update Images",
+            "head": "updateimages/image-repository-updated",
+            "body": "Upstream images have updated.",
+            "base": "main"
+          }'
+        env:
+          BEARER_TOKEN: ${{ steps.app-token.outputs.token }}
